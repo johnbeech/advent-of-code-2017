@@ -5,12 +5,15 @@
   "main": "start.js",
   "scripts": {
     "start": "node run.js",
-    "test": "node run.js",
-    "create": "./copy-template.sh"
+    "test": "npm run lint",
+    "create": "./copy-template.sh",
+    "lint": "standard --fix"
   },
   "author": "John Beech",
   "license": "UNLICENSED",
   "dependencies": {
-    "promise-path": "^1.2.6"
+    "pre-push": "^0.1.1",
+    "promise-path": "^1.2.6",
+    "standard": "^10.0.3"
   }
 }
