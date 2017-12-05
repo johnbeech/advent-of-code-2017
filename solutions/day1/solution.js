@@ -2,7 +2,7 @@ const path = require('path')
 const {read} = require('promise-path')
 const NL = '\n'
 
-function sum(arr) {
+function sum (arr) {
   return arr.reduce((acc, d) => acc + d, 0)
 }
 
