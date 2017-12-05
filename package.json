@@ -4,8 +4,12 @@
   "description": "My solutions for Advent of Code 2017, written in JavaScript using nodejs",
   "main": "start.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node run.js",
+    "test": "node run.js"
   },
   "author": "John Beech",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "dependencies": {
+    "promise-path": "^1.2.6"
+  }
 }
