@@ -5,7 +5,8 @@
   "main": "start.js",
   "scripts": {
     "start": "node run.js",
-    "test": "node run.js"
+    "test": "node run.js",
+    "create": "./copy-template.sh"
   },
   "author": "John Beech",
   "license": "UNLICENSED",
