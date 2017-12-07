@@ -29,7 +29,7 @@ function testForValidPhraseAdvanced (phrase) {
   return validPhrase
 }
 
-function sortWord(word) {
+function sortWord (word) {
   return word.split('').sort().join('')
 }
 
