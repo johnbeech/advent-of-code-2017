@@ -15,15 +15,36 @@ function testForValidPhrase (phrase) {
   return validPhrase
 }
 
+function testForValidPhraseAdvanced (phrase) {
+  let uniqueWords = {}
+  let words = phrase.split(' ')
+  let validPhrase = true
+  words.forEach(word => {
+    const anagram = sortWord(word)
+    uniqueWords[anagram] = (uniqueWords[anagram] || 0) + 1
+    if (uniqueWords[anagram] > 1) {
+      validPhrase = false
+    }
+  })
+  return validPhrase
+}
+
+function sortWord(word) {
+  return word.split('').sort().join('')
+}
+
 async function run () {
   const input = await read(path.join(__dirname, 'input.txt'), 'utf8')
   const phrases = input.split(NL).filter(n => n)
 
-  let validPhrases = phrases.filter(testForValidPhrase)
-  // let invalidPhrases = phrases.filter((n) => !testForValidPhrase(n))
-  let solution = validPhrases.length
+  let validPhrases1 = phrases.filter(testForValidPhrase)
+  let solution1 = validPhrases1.length
 
-  report(input, solution)
+  let validPhrases2 = phrases.filter(testForValidPhraseAdvanced)
+  let solution2 = validPhrases2.length
+
+  report(input.length, solution1)
+  report(input.length, solution2)
 }
 
 function report (input, solution) {
