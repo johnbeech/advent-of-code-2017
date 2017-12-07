@@ -15,6 +15,11 @@ function createGrid (size) {
     return grid.cells[key] || false
   }
 
+  grid.set = (x, y, value) => {
+    const key = [x, y].join(':')
+    return grid.cells[key] = value
+  }
+
   let i = 0
   while (i < size) {
     createCell(grid)
@@ -27,7 +32,8 @@ function createGrid (size) {
 }
 
 function createCell (grid) {
-  let key = [grid.x, grid.y].join(':')
+  let { x, y } = grid
+  let key = [x, y].join(':')
   grid.size = grid.size + 1
   grid.cells[key] = true
 
@@ -42,7 +48,41 @@ function createCell (grid) {
     turnLeft(grid)
     // console.log(`Turning ${(['East', 'North', 'West', 'South'])[grid.direction]}`)
   }
+
+  return { x, y }
 }
+
+function numerateGrid (maxCount) {
+  const grid = createGrid(1)
+  grid.cells['0:0'] = 1
+
+  let location
+  let value = 0
+  while (value < maxCount) {
+    location = createCell(grid)
+    value = sumNeighbours(grid, location)
+    grid.set(location.x, location.y, value)
+    console.log('Location', location, value)
+  }
+
+  console.log('Max value', value, 'at', location)
+}
+
+function sumNeighbours (grid, location) {
+  let sum = 0
+  let { x, y } = location
+  sum = sum + (grid.get(x + 0, y - 1) || 0)
+  sum = sum + (grid.get(x + 0, y + 1) || 0)
+  sum = sum + (grid.get(x + 1, y - 1) || 0)
+  sum = sum + (grid.get(x + 1, y + 0) || 0)
+  sum = sum + (grid.get(x + 1, y + 1) || 0)
+  sum = sum + (grid.get(x - 1, y - 1) || 0)
+  sum = sum + (grid.get(x - 1, y + 0) || 0)
+  sum = sum + (grid.get(x - 1, y + 1) || 0)
+
+  return sum
+}
+
 
 function shouldTurn (grid) {
   let { x, y, direction } = grid
@@ -109,9 +149,9 @@ async function run () {
     test.y = grid.y
   })
 
-  let solutionGrid = createGrid(gridSize)
-
   report(input, tests)
+
+  numerateGrid(gridSize)
 }
 
 function report (input, solution) {
