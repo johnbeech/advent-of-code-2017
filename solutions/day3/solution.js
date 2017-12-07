@@ -17,7 +17,7 @@ function createGrid (size) {
 
   grid.set = (x, y, value) => {
     const key = [x, y].join(':')
-    return grid.cells[key] = value
+    grid.cells[key] = value
   }
 
   let i = 0
@@ -82,7 +82,6 @@ function sumNeighbours (grid, location) {
 
   return sum
 }
-
 
 function shouldTurn (grid) {
   let { x, y, direction } = grid
