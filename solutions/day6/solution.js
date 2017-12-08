@@ -44,7 +44,10 @@ function solve(blocks) {
     }
   } while(!solved)
 
-  return Object.keys(history).length
+  return {
+    history: Object.keys(history),
+    blocks
+  }
 }
 
 async function run () {
@@ -53,9 +56,11 @@ async function run () {
 
   // blocks = [0, 2, 7, 0]
 
-  let solution = solve(blocks)
+  let solution1 = solve(blocks)
+  let solution2 = solve(solution1.blocks)
 
-  report(blocks, solution)
+  report(blocks, solution1.history.length)
+  report(blocks, solution2.history.length)
 }
 
 function report (input, solution) {
