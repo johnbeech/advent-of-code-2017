@@ -2,7 +2,7 @@ const path = require('path')
 const {read} = require('promise-path')
 const TAB = '\t'
 
-function distribute(blocks) {
+function distribute (blocks) {
   blocks = [].concat(blocks)
   const highestBlock = Math.max(...blocks)
   const startIndex = blocks.indexOf(highestBlock)
@@ -27,7 +27,7 @@ function distribute(blocks) {
   return blocks
 }
 
-function solve(blocks) {
+function solve (blocks) {
   let history = {}
   let solved = false
   let key
@@ -36,13 +36,12 @@ function solve(blocks) {
     if (history[key]) {
       solved = true
       console.log('Solve at:', blocks, 'after', Object.keys(history).length, 'steps')
-    }
-    else {
+    } else {
       history[key] = true
       console.log(' Step to:', blocks)
       blocks = distribute(blocks)
     }
-  } while(!solved)
+  } while (!solved)
 
   return {
     history: Object.keys(history),
