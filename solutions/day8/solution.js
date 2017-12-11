@@ -42,18 +42,26 @@ function processInstruction (instruction, register) {
   if (check(register[instruction.conditionRegister], instruction.conditionValue)) {
     const operation = operations[instruction.operation]
     register[instruction.operationRegister] = operation(register[instruction.operationRegister], instruction.operationValue)
+    register.maximumValue = Math.max(register[instruction.operationRegister], register.maximumValue)
   }
 }
 
 function solve (input) {
   const instructions = input.split(NL).map(n => n.trim()).filter(n => n).map(parseInstruction)
 
-  const register = {}
+  const register = {
+    maximumValue: 0
+  }
   instructions.forEach(instruction => processInstruction(instruction, register))
 
+  const maximumValue = register.maximumValue
+  delete register.maximumValue
   const maxRegister = Math.max(...Object.keys(register).map(key => register[key]))
 
-  return maxRegister
+  return {
+    maxRegister,
+    maximumValue
+  }
 }
 
 async function run () {
