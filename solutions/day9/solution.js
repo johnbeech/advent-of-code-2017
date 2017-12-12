@@ -68,6 +68,12 @@ function readToken (stream, state) {
     state.previousTokens.shift()
   }
 
+  if (states[state.action][token]) {
+    usedCombinations[[state.action, token].join(':')]++
+  } else {
+    usedCombinations[[state.action, 'default'].join(':')]++
+  }
+
   if (action) {
     methods[action](state)
     state.action = action
@@ -87,8 +93,6 @@ const states = {
   },
   'closeGroup': {
     ',': 'nextGroup',
-    '{': 'openGroup',
-    '<': 'openGarbage',
     '}': 'closeGroup'
   },
   'openGarbage': {
@@ -103,11 +107,7 @@ const states = {
   },
   'closeGarbage': {
     ',': 'nextGroup',
-    '{': 'openGroup',
-    '}': 'closeGroup',
-    '<': 'openGarbage',
-    '>': 'closeGarbage',
-    '!': 'skipGarbage'
+    '}': 'closeGroup'
   },
   'skipGarbage': {
     'default': 'anyGarbage'
@@ -117,6 +117,14 @@ const states = {
     '<': 'openGarbage'
   }
 }
+
+const usedCombinations = {}
+Object.keys(states).forEach(action => {
+  const options = states[action]
+  Object.keys(options).forEach(token => {
+    usedCombinations[[action, token].join(':')] = 0
+  })
+})
 
 const methods = {
   start, openGroup, closeGroup, openGarbage, closeGarbage, skipGarbage, nextGroup, anyGarbage
@@ -172,6 +180,8 @@ async function run () {
   const solutions = tests.map(solve)
 
   solutions.forEach(s => report(s.sums, s.solution))
+
+  console.log('[DEBUG]', JSON.stringify(usedCombinations, null, 2))
 }
 
 function report (input, solution) {
