@@ -30,7 +30,131 @@ function parseTests (input) {
 }
 
 function solve (entry) {
-  return entry
+  let stream = entry.input.split('')
+
+  const state = {
+    groupLevel: 0,
+    groupSum: [],
+    openGroups: 0,
+    closedGroups: 0,
+    openGarbage: 0,
+    closedGarbage: 0,
+    nextGroupComma: 0,
+    skipTokens: 0,
+    garbageTokens: 0,
+    previousTokens: [],
+    action: 'start'
+  }
+
+  while (stream.length > 0) {
+    readToken(stream, state)
+  }
+
+  return {
+    solution: state.groupSum.reduce((acc, n) => acc + n, 0),
+    sums: {
+      input: entry.input,
+      solution: entry.solution
+    }
+  }
+}
+
+function readToken (stream, state) {
+  const token = stream.shift()
+  const action = states[state.action][token] || states[state.action].default
+
+  state.previousTokens.push(token)
+  if (state.previousTokens.length > 10) {
+    state.previousTokens.shift()
+  }
+
+  if (action) {
+    methods[action](state)
+    state.action = action
+  } else {
+    throw new Error('Unexpected token ' + token + ' at action ' + state.action + ' given ' + state.previousTokens.join('') + ' ' + JSON.stringify(state))
+  }
+}
+
+const states = {
+  'start': {
+    '{': 'openGroup'
+  },
+  'openGroup': {
+    '{': 'openGroup',
+    '}': 'closeGroup',
+    '<': 'openGarbage'
+  },
+  'closeGroup': {
+    ',': 'nextGroup',
+    '{': 'openGroup',
+    '<': 'openGarbage',
+    '}': 'closeGroup'
+  },
+  'openGarbage': {
+    '>': 'closeGarbage',
+    '!': 'skipGarbage',
+    'default': 'anyGarbage'
+  },
+  'anyGarbage': {
+    '>': 'closeGarbage',
+    '!': 'skipGarbage',
+    'default': 'anyGarbage'
+  },
+  'closeGarbage': {
+    ',': 'nextGroup',
+    '{': 'openGroup',
+    '}': 'closeGroup',
+    '<': 'openGarbage',
+    '>': 'closeGarbage',
+    '!': 'skipGarbage'
+  },
+  'skipGarbage': {
+    'default': 'anyGarbage'
+  },
+  'nextGroup': {
+    '{': 'openGroup',
+    '<': 'openGarbage'
+  }
+}
+
+const methods = {
+  start, openGroup, closeGroup, openGarbage, closeGarbage, skipGarbage, nextGroup, anyGarbage
+}
+
+function start () {
+
+}
+
+function openGroup (state) {
+  state.groupLevel++
+  state.groupSum.push(state.groupLevel)
+  state.openGroups++
+}
+
+function closeGroup (state) {
+  state.groupLevel--
+  state.closedGroups++
+}
+
+function openGarbage (state) {
+  state.openGarbage++
+}
+
+function closeGarbage (state) {
+  state.closedGarbage++
+}
+
+function nextGroup (state) {
+  state.nextGroupComma++
+}
+
+function skipGarbage (state) {
+  state.skipTokens++
+}
+
+function anyGarbage (state) {
+  state.garbageTokens++
 }
 
 async function run () {
