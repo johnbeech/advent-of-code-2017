@@ -36,9 +36,19 @@ function solve (input) {
 
   const group = scan(index[0])
 
+  const groups = []
+  const scannedNodes = {}
+  Object.keys(index).forEach(id => {
+    const node = index[id]
+    const group = scan(node, scannedNodes)
+    if (group) {
+      groups.push(group)
+    }
+  })
+
   return {
     input,
-    actual: group.length + ' : ' + group.join(', ')
+    actual: ' group at program 0: ' + group.length + ' : ' + group.join(', ') + ' : ' + groups.length + ' groups total'
   }
 }
 
