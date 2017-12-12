@@ -21,6 +21,7 @@ const directions = {
 
 function solve (test) {
   test.actual = 0
+  test.maxSteps = 0
 
   const position = {
     x: 0,
@@ -32,14 +33,16 @@ function solve (test) {
     if (direction) {
       position.x = position.x + direction.x
       position.y = position.y + direction.y
+
+      test.stepDistance = (Math.abs(position.x) + Math.abs(position.y) + Math.abs(position.x - position.y)) / 2
+      test.maxSteps = Math.max(test.maxSteps, test.stepDistance)
     } else {
       console.log(`"${step}" is not a valid direction`)
     }
   })
 
   test.position = position
-  test.stepDistance = (Math.abs(position.x) + Math.abs(position.y) + Math.abs(position.x - position.y)) / 2
-  test.actual = test.stepDistance + ' ? ' + JSON.stringify(position)
+  test.actual = 'Step Distance: ' + test.stepDistance + ', Position: ' + JSON.stringify(position) + ', Max Steps: ' + test.maxSteps
 
   return test
 }
