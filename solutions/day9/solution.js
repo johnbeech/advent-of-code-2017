@@ -50,8 +50,10 @@ function solve (entry) {
     readToken(stream, state)
   }
 
+  const groupSum = state.groupSum.reduce((acc, n) => acc + n, 0)
+
   return {
-    solution: state.groupSum.reduce((acc, n) => acc + n, 0),
+    solution: 'Group Sum: ' + groupSum + ' Garbage Tokens: ' + state.garbageTokens,
     sums: {
       input: entry.input,
       solution: entry.solution
@@ -159,6 +161,7 @@ function nextGroup (state) {
 
 function skipGarbage (state) {
   state.skipTokens++
+  state.garbageTokens--
 }
 
 function anyGarbage (state) {
