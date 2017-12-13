@@ -11,96 +11,70 @@ function parseNetworkEntry (line) {
 }
 
 function parseNetworkScan (input) {
-  const columns = input.split(NL).map(n => n.trim()).filter(n => n).map(parseNetworkEntry)
+  const columns = input.split(NL).map(n => n.trim()).filter(n => n).map(parseNetworkEntry).reduce((a, n) => {
+    a[n.depth] = n
+    return a
+  }, [])
+
+  let i = 0
+  while (i < columns.length) {
+    columns[i] = columns[i] || {
+      depth: i,
+      range: 0
+    }
+    i++
+  }
+
   return {
     columns,
     input
   }
 }
 
-function createNetwork (columns) {
-  const network = []
-  const networkSize = Math.max(...columns.map(c => c.depth))
-
-  let c
-  while (network.length <= networkSize) {
-    c = network.length
-    network[c] = columns.filter(c => c.depth === network.length)[0] || {
-      depth: c,
-      range: 0
-    }
-
-    network[c].scanner = {
-      position: -1,
-      direction: 1
-    }
-  }
-
-  network.moveScanners = function () {
-    network.forEach(n => {
-      // reference the scanner
-      const scanner = n.scanner
-
-      // move the scanner along the track
-      if (n.range) {
-        scanner.position = scanner.position + scanner.direction
-
-        // flip direction at either end
-        if (scanner.direction === -1 && scanner.position === 0) {
-          scanner.direction = -scanner.direction
-        } else if (scanner.direction === 1 && scanner.position === (n.range - 1)) {
-          scanner.direction = -scanner.direction
-        }
+function calculateSeverity (columns, delay) {
+  return columns.map(c => {
+    if (c.range) {
+      const picosecond = delay + c.depth
+      const circularRange = (c.range - 1) * 2
+      const scannerPos = picosecond % circularRange
+      if (scannerPos === 0) {
+        return {caught: true, score: c.range * c.depth}
       }
-    })
-  }
-
-  network.moveScanners()
-
-  return network
-}
-
-function sp (n) {
-  n = n + ''
-  if (n.length < 2) {
-    n = ' ' + n
-  }
-  return n
+    }
+    return {caught: false, score: 0}
+  })
 }
 
 function solve (networkScan) {
-  const network = createNetwork(networkScan.columns)
+  let score = scoreRun(networkScan.columns, 0)
 
-  function printNetwork (network, pos) {
-    console.log(' ' + network.map(n => sp(n.depth)).join(' '))
-    console.log(' ' + network.map(n => sp(n.range)).join(' '))
-    console.log(' ' + network.map(n => sp('-')).join(' '))
-    console.log(' ' + network.map(n => sp(n.depth === pos ? 'X' : 'o')).join(' '))
-    console.log(' ' + network.map(n => sp(n.scanner.position)).join(' '))
-    console.log('')
-  }
+  let delay = 0
 
-  const steps = network.length
-  const severity = []
-  while (severity.length < steps) {
-    const pos = severity.length
-    const node = network[pos]
-    let score = 0
-
-    if (node.scanner.position === 0) {
-      score = node.depth * node.range
+  do {
+    delay = delay + 1
+    score = scoreRun(networkScan.columns, delay)
+    if (delay % 1000 === 0) {
+      console.log('Delay', delay)
     }
-    severity.push(score)
-
-    network.moveScanners()
-
-    printNetwork(network, pos)
-  }
+  } while (score.gotCaught)
 
   return {
     input: networkScan.input,
     columns: networkScan.columns,
-    actual: severity.join(', ') + ' : Severity Score : ' + severity.reduce((acc, n) => acc + n, 0)
+    actual: score.record.map(r => r.caught ? `(${r.score})` : 0).join(', ') + ' : Severity Score : ' + score.total + ' : Safepath Delay : ' + delay
+  }
+}
+
+function scoreRun (columns, delay) {
+  const severity = calculateSeverity(columns, delay)
+  const total = severity.reduce((acc, n) => acc + n.score, 0)
+  const gotCaught = severity.reduce((acc, n) => acc || n.caught, false)
+
+  return {
+    record: severity,
+    gotCaught,
+    total,
+    delay
   }
 }
 
