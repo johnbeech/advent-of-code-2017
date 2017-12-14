@@ -1,5 +1,5 @@
 const path = require('path')
-const {read} = require('promise-path')
+const {read, write} = require('promise-path')
 const knothash = require('./knothash')
 const NL = '\n'
 
@@ -93,8 +93,76 @@ function solve (key) {
   }
 }
 
+function saveHTMLGrid (solution) {
+  const size = 128
+  console.log('Solution for:', solution.key, ': Squares in use :', solution.squaresInUse, 'Regions in use : ', solution.regionCount)
+
+  const grid = solution.grid
+  const regions = solution.regions
+
+  let row
+  let key
+
+  const colors = {}
+  function color (num) {
+    if (colors[num]) {
+      return colors[num]
+    }
+    let hash = knothash(num)
+    let r = hash[0].toString(16) + hash[1].toString(16)
+    let g = hash[2].toString(16) + hash[3].toString(16)
+    let b = hash[4].toString(16) + hash[5].toString(16)
+
+    colors[num] = '#' + r + g + b
+
+    return colors[num]
+  }
+
+  const rows = []
+  for (let j = 0; j < size; j++) {
+    row = []
+    for (let i = 0; i < size; i++) {
+      key = `${i},${j}`
+      row.push(grid[key] ? color(regions[key]) : '#000')
+    }
+    rows.push(row)
+  }
+  const html = `
+<html>
+  <head><title>${solution.key}</title></head>
+  <style>
+    .grid {
+      display: block;
+      width: 512px;
+      height: 512px;
+      overflow: hidden;
+    }
+    .grid > div {
+      width: 4px;
+      height: 4px;
+      display: inline-block;
+      overflow: hidden;
+    }
+  </style>
+<body>
+  <div class="grid">
+    ${rows.map((row, i) => {
+      return row.map((col, i) => {
+        return '<div style="background:' + col + '"></div>'
+      }).join('')
+    }).join('')}
+  </div>
+</body>
+</html>
+  `
+
+  write(`${__dirname}/${solution.key}.html`, html, 'utf8').then(() => {
+    console.log('Wrote', `${solution.key}.html`)
+  })
+}
+
 function printGrid (solution) {
-  const size = 96
+  const size = 16
   console.log('Solution for:', solution.key, ': Squares in use :', solution.squaresInUse, 'Regions in use : ', solution.regionCount)
 
   const grid = solution.grid
@@ -124,6 +192,7 @@ async function run () {
   const solutions = keys.map(solve)
 
   solutions.map(printGrid)
+  solutions.map(saveHTMLGrid)
 }
 
 run()

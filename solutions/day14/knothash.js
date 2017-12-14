@@ -40,7 +40,7 @@ function hexCode (value) {
 
 function calculateKnotHash (input) {
   const values = []
-  const lengths = input.split('').map(n => (n + '').charCodeAt(0)).concat(...salt)
+  const lengths = (input + '').split('').map(n => (n + '').charCodeAt(0)).concat(...salt)
 
   let skipSize = 0
   let position = 0
