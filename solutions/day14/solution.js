@@ -3,8 +3,11 @@ const {read} = require('promise-path')
 const NL = '\n'
 
 function solve (key) {
+  let squaresInUse = 0
+
   return {
-    key
+    key,
+    squaresInUse
   }
 }
 
@@ -13,7 +16,7 @@ function print8x8 (solution) {
   let row
   let key
 
-  console.log('Solution for:', solution.key)
+  console.log('Solution for:', solution.key, ': Squares in use :', solution.squaresInUse)
   for (let j = 0; j < size; j++) {
     row = []
     for (let i = 0; i < size; i++) {
