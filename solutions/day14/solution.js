@@ -41,27 +41,75 @@ function solve (key) {
     hashes.push(hash)
   }
 
+  function locRef (i, j) {
+    return {
+      i, j, key: `${i},${j}`
+    }
+  }
+
+  function gridLoc (i, j) {
+    const loc = locRef(i, j)
+    return grid[loc.key] ? loc : false
+  }
+
+  function adjacent (i, j) {
+    return [
+      gridLoc(i, j - 1),
+      gridLoc(i - 1, j),
+      gridLoc(i, j + 1),
+      gridLoc(i + 1, j)
+    ].filter(n => n)
+  }
+
+  const regions = {}
+  let regionCount = 0
+  let filled = []
+
+  for (let j = 0; j < 128; j++) {
+    for (let i = 0; i < 128; i++) {
+      let loc = locRef(i, j)
+      if (grid[loc.key] && !regions[loc.key]) {
+        console.log('Increasing region count', regionCount, 'at', loc.key, 'grid', grid[loc.key])
+        regionCount++
+        regions[loc.key] = regionCount
+        filled.push(loc)
+        do {
+          loc = filled.shift()
+          filled = filled.concat(adjacent(loc.i, loc.j).filter(loc => !regions[loc.key])).map(loc => {
+            regions[loc.key] = regionCount
+            return loc
+          })
+        } while (filled.length > 0)
+      }
+    }
+  }
+
   return {
     key,
     squaresInUse,
-    grid
+    grid,
+    regions,
+    regionCount
   }
 }
 
-function print8x8 (solution) {
-  console.log('Solution for:', solution.key, ': Squares in use :', solution.squaresInUse)
+function printGrid (solution) {
+  const size = 96
+  console.log('Solution for:', solution.key, ': Squares in use :', solution.squaresInUse, 'Regions in use : ', solution.regionCount)
 
-  const size = 8
   const grid = solution.grid
+  const regions = solution.regions
 
   let row
   let key
+
+  const alphabet = '0123456789abcdefghijklmnopqrstuvwxyz'.split('')
 
   for (let j = 0; j < size; j++) {
     row = []
     for (let i = 0; i < size; i++) {
       key = `${i},${j}`
-      row.push(grid[key] ? '#' : '.')
+      row.push(grid[key] ? alphabet[regions[key]] || '#' : '.')
     }
     console.log(row.join(' '))
   }
@@ -70,20 +118,12 @@ function print8x8 (solution) {
 
 async function run () {
   const input = await read(path.join(__dirname, 'input.txt'), 'utf8')
-  let solution = 'UNSOLVED'
 
   const keys = input.split(NL).map(n => n.trim()).filter(n => n)
 
   const solutions = keys.map(solve)
 
-  solutions.map(print8x8)
-
-  report(input, solution)
-}
-
-function report (input, solution) {
-  const solutionName = __dirname.split(path.sep).pop()
-  console.log('Advent of Code 2017 :', solutionName, 'solution for', input, ':', solution)
+  solutions.map(printGrid)
 }
 
 run()
