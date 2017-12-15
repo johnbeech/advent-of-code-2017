@@ -17,7 +17,7 @@ function parseInput (input) {
   return input.split(NL).map(n => n.trim()).filter(n => n).map(parseLine)
 }
 
-function lp (str, len = 12) {
+function lp (str, len = 16) {
   str = str + ''
   while (str.length < len) {
     str = ' ' + str
@@ -33,6 +33,10 @@ function solve (item) {
   let n = 0
   let valueA = item.A
   let valueB = item.B
+  let totalMatchces = 0
+
+  let bitsA = 0
+  let bitsB = 0
 
   console.log([lp('Generator A'), lp('Generator B')].join(' '))
   console.log([lp('-----------'), lp('-----------')].join(' '))
@@ -43,12 +47,29 @@ function solve (item) {
     valueB = (genBOffset * valueB) % remainderOffset
 
     console.log([lp(valueA), lp(valueB)].join(' '))
+
+    bitsA = valueA & 0xFFFF
+    bitsB = valueB & 0xFFFF
+
+    if (bitsA === bitsB) {
+      console.log([lp(bitsA.toString(2)), lp(bitsB.toString(2))].join(' '))
+      totalMatchces++
+    }
+
     n++
   }
 
   while (n < 40000000) {
     valueA = (genAOffset * valueA) % remainderOffset
     valueB = (genBOffset * valueB) % remainderOffset
+
+    bitsA = valueA & 0xFFFF
+    bitsB = valueB & 0xFFFF
+
+    if (bitsA === bitsB) {
+      totalMatchces++
+    }
+
     n++
   }
 
@@ -56,6 +77,8 @@ function solve (item) {
   console.log([lp(valueA), lp(valueB)].join(' '))
 
   console.log('')
+
+  item.actual = totalMatchces
 
   return item
 }
