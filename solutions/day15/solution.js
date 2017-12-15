@@ -25,11 +25,19 @@ function lp (str, len = 16) {
   return str
 }
 
-function solve (item) {
-  const genAOffset = 16807
-  const genBOffset = 48271
-  const remainderOffset = 2147483647
+const genAOffset = 16807
+const genBOffset = 48271
 
+const genAFilter = 4
+const genBFilter = 8
+
+const remainderOffset = 2147483647
+
+function printLine (a, b) {
+  console.log([lp(a), lp(b)].join(' '))
+}
+
+function solvePart1 (item) {
   let n = 0
   let valueA = item.A
   let valueB = item.B
@@ -38,9 +46,9 @@ function solve (item) {
   let bitsA = 0
   let bitsB = 0
 
-  console.log([lp('Generator A'), lp('Generator B')].join(' '))
-  console.log([lp('-----------'), lp('-----------')].join(' '))
-  console.log([lp(valueA), lp(valueB)].join(' '))
+  printLine('Generator A:1', 'Generator B:1')
+  printLine('-------------', '-------------')
+  printLine(valueA, valueB)
 
   while (n < 10) {
     valueA = (genAOffset * valueA) % remainderOffset
@@ -52,7 +60,7 @@ function solve (item) {
     bitsB = valueB & 0xFFFF
 
     if (bitsA === bitsB) {
-      console.log([lp(bitsA.toString(2)), lp(bitsB.toString(2))].join(' '))
+      printLine(bitsA.toString(2), bitsB.toString(2))
       totalMatchces++
     }
 
@@ -73,8 +81,8 @@ function solve (item) {
     n++
   }
 
-  console.log([lp('..........'), lp('..........')].join(' '))
-  console.log([lp(valueA), lp(valueB)].join(' '))
+  printLine('............', '............')
+  printLine(valueA, valueB)
 
   console.log('')
 
@@ -83,12 +91,89 @@ function solve (item) {
   return item
 }
 
+function solvePart2 (item) {
+  const generatorA = createGenerator(item.A, genAOffset, genAFilter)
+  const generatorB = createGenerator(item.B, genBOffset, genBFilter)
+
+  let valueA = item.A
+  let valueB = item.B
+
+  printLine('Generator A:2', 'Generator B:2')
+  printLine('-------------', '-------------')
+  printLine(valueA, valueB)
+
+  let n = 0
+  let totalMatchces = 0
+
+  let bitsA = 0
+  let bitsB = 0
+
+  while (n < 10) {
+    valueA = generatorA.generate()
+    valueB = generatorB.generate()
+    printLine(valueA, valueB)
+
+    bitsA = valueA & 0xFFFF
+    bitsB = valueB & 0xFFFF
+
+    if (bitsA === bitsB) {
+      printLine(bitsA.toString(2), bitsB.toString(2))
+      totalMatchces++
+    }
+
+    n++
+  }
+
+  while (n < 5000000) {
+    valueA = generatorA.generate()
+    valueB = generatorB.generate()
+
+    bitsA = valueA & 0xFFFF
+    bitsB = valueB & 0xFFFF
+
+    if (bitsA === bitsB) {
+      totalMatchces++
+    }
+
+    n++
+  }
+
+  printLine('............', '............')
+  printLine(valueA, valueB)
+
+  console.log('')
+
+  item.actual = totalMatchces
+
+  return item
+}
+
+function createGenerator (startValue, factorOffset, filter) {
+  const remainderOffset = 2147483647
+
+  let value = startValue
+
+  function generate () {
+    do {
+      value = (factorOffset * value) % remainderOffset
+    } while (value % filter !== 0)
+
+    return value
+  }
+
+  return {
+    generate
+  }
+}
+
 async function run () {
   const input = await read(path.join(__dirname, 'input.txt'), 'utf8')
 
-  const solutions = parseInput(input).map(solve)
+  const part1solutions = parseInput(input).map(solvePart1)
+  const part2solutions = parseInput(input).map(solvePart2)
 
-  solutions.map(report)
+  part1solutions.map(report)
+  part2solutions.map(report)
 }
 
 function report (solution) {
