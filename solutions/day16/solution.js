@@ -61,6 +61,34 @@ function solve (item) {
 
   item.actual = positions.join('')
 
+  let n = 1
+  while (positions.join('') !== item.programs) {
+    item.moves.forEach(move => {
+      const l = move.charAt(0)
+      const fn = fns[l]
+      fn(move)
+    })
+    n++
+  }
+
+  const iterations = 1000000000
+  const spareIterations = iterations % n
+
+  console.log('Positions repeat after', n, 'iterations.', 'Spare iterations after', Math.floor(iterations / n), 'repeats, is:', spareIterations)
+
+  let m = 0
+  positions = item.programs.split('')
+  while (m < spareIterations) {
+    item.moves.forEach(move => {
+      const l = move.charAt(0)
+      const fn = fns[l]
+      fn(move)
+    })
+    m++
+  }
+
+  item.danceEnd = positions.join('')
+
   return item
 }
 
@@ -75,7 +103,7 @@ async function run () {
 
 function report (solution) {
   const solutionName = __dirname.split(path.sep).pop()
-  console.log('Advent of Code 2017 :', solutionName, 'solution for', solution.programs, ':', solution.actual, ':', solution.expected)
+  console.log('Advent of Code 2017 :', solutionName, 'solution for', solution.programs, ':', solution.actual, ':', solution.expected, ': Dance End :', solution.danceEnd)
 }
 
 run()
