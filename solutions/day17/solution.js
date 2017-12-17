@@ -23,37 +23,69 @@ function lp (str, len = 4, prefix = ' ') {
   return str
 }
 
-function printState (result, pos) {
-  console.log('[State]', result.map((n, i) => {
-    const p = i === pos ? `(${n})` : n
-    return lp(p, 6, ' ')
-  }).join(' '))
+function singleLinkedCircularList (val) {
+  const list = {}
+  const start = {
+    val
+  }
+
+  start.n = start
+
+  function insertAfter (item, val) {
+    const newItem = {
+      val
+    }
+    newItem.n = item.n
+    item.n = newItem
+    list.length++
+  }
+
+  function print (pos) {
+    let node = start
+    let result = []
+    do {
+      let p = node === pos ? `(${node.val})` : node.val
+      result.push(lp(p, 6, ' '))
+      node = node.n
+    } while (node !== start)
+    console.log('[List]', result.join(' '))
+  }
+
+  list.insertAfter = insertAfter
+  list.start = start
+  list.length = 1
+  list.print = print
+
+  return list
 }
 
 function solve (item) {
-  const result = [0]
-
   console.log('Item', item)
 
-  let pos = 0
   let i = 0
-  let val = 0
+  let j = 0
+  const list = singleLinkedCircularList(0)
+  let pos = list.start
 
   do {
     if (item.spinLength <= 10) {
-      printState(result, pos, val, i)
+      list.print(pos)
     }
 
-    pos = (pos + item.spinSize) % result.length
-    val = result.length
-    result.splice(pos + 1, 0, val)
-    pos = (pos + 1) % result.length
+    j = 0
+    do {
+      pos = pos.n
+      j++
+    } while (j < item.spinSize)
+    list.insertAfter(pos, list.length)
+    pos = pos.n
     i++
   } while (i < item.spinLength)
 
-  item.actual = result[(pos + 1) % result.length]
+  const part1 = pos.n.val
+  const part2 = '????'
 
-  printState(result, pos)
+  item.actual = 'Part 1: ' + part1 + ' ---> Part 2: ' + part2
 
   return item
 }
