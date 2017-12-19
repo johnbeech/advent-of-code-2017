@@ -72,6 +72,7 @@ function solve (input) {
   }
 
   const letters = []
+  let steps = 0
   let pos = locate({x: input[0].indexOf('|'), y: 0, symbol: '|', direction: {x: 0, y: 1}})
   do {
     console.log(`[${pos.x}, ${pos.y}] ${pos.symbol}, D${pos.direction.x},${pos.direction.y}`)
@@ -79,9 +80,11 @@ function solve (input) {
     if (pos && pos.symbol && !exitsMap[pos.symbol]) {
       letters.push(pos.symbol)
     }
+    steps++
   } while (pos)
 
   solution.letters = letters
+  solution.steps = steps
   solution.gridSize = gridSize
 
   return solution
@@ -98,7 +101,7 @@ async function run () {
 
 function report (solution) {
   const solutionName = __dirname.split(path.sep).pop()
-  console.log('Advent of Code 2017 :', solutionName, 'solution for', solution.gridSize, ':', solution.letters.join(''))
+  console.log('Advent of Code 2017 :', solutionName, 'solution for', solution.gridSize, ':', solution.letters.join(''), ': steps : ', solution.steps)
 }
 
 run()
