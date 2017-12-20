@@ -14,6 +14,7 @@
   "dependencies": {
     "pre-push": "^0.1.1",
     "promise-path": "^1.2.6",
-    "standard": "^10.0.3"
+    "standard": "^10.0.3",
+    "stats-lite": "^2.1.0"
   }
 }
