@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Animated Advent of Code - Day 19</title>
+    <style>
+    /* http://meyerweb.com/eric/tools/css/reset/
+       v2.0 | 20110126
+       License: none (public domain)
+    */
+
+    html, body, div, span, applet, object, iframe,
+    h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+    a, abbr, acronym, address, big, cite, code,
+    del, dfn, em, img, ins, kbd, q, s, samp,
+    small, strike, strong, sub, sup, tt, var,
+    b, u, i, center,
+    dl, dt, dd, ol, ul, li,
+    fieldset, form, label, legend,
+    table, caption, tbody, tfoot, thead, tr, th, td,
+    article, aside, canvas, details, embed,
+    figure, figcaption, footer, header, hgroup,
+    menu, nav, output, ruby, section, summary,
+    time, mark, audio, video {
+    	margin: 0;
+    	padding: 0;
+    	border: 0;
+    	font-size: 100%;
+    	font: inherit;
+    	vertical-align: baseline;
+    }
+
+    /* HTML5 display-role reset for older browsers */
+    article, aside, details, figcaption, figure,
+    footer, header, hgroup, menu, nav, section {
+    	display: block;
+    }
+    body {
+    	line-height: 1;
+    }
+    ol, ul {
+    	list-style: none;
+    }
+    blockquote, q {
+    	quotes: none;
+    }
+    blockquote:before, blockquote:after,
+    q:before, q:after {
+    	content: '';
+    	content: none;
+    }
+    table {
+    	border-collapse: collapse;
+    	border-spacing: 0;
+    }
+
+    /* Day 19 Animation CSS */
+    html, body {
+      background: black;
+      color: #00FF00;
+      font-family: monospace;
+      font-size: 20px;
+
+      padding: 20px;
+    }
+
+    p {
+      margin: 12px 0;
+    }
+
+    a {
+      color: #CFC;
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: #EFD;
+    }
+
+    #input {
+      font-family: monospace;
+      font-size: 20px;
+      line-height: 20px;
+      letter-spacing: 0px;
+      background: #111;
+      color: #EEE;
+      overflow: hidden;
+
+      width: 170px;
+      height: 120px;
+
+      border: 2px solid #666;
+    }
+
+    .letter {
+      position: absolute;
+      display: block;
+      font-family: monospace;
+      font-size: 7px;
+      line-height: 7px;
+      width: 7px;
+      height: 7px;
+    }
+
+    #puzzle {
+      position: relative;
+    }
+    </style>
+    <script type="text/javascript" src="solve.js"></script>
+    <script type="text/javascript">
+      function start() {
+        const $input = document.getElementById('input')
+        const $instructions = document.getElementById('instructions')
+        const $puzzle = document.getElementById('puzzle')
+        const $errors = document.getElementById('errors')
+
+        const solution = solve(input.value)
+
+        console.log('Solution', solution)
+
+        $instructions.style.display = 'none';
+        const puzzleView = createPuzzleGrid(solution)
+
+        console.log('Puzzle View', puzzleView)
+
+        $puzzle.appendChild(puzzleView.$root)
+      }
+
+      function createDiv(id, className) {
+        const $el = document.createElement('div')
+        $el.id = id
+        $el.className = className
+        return $el
+      }
+
+      function createPuzzleGrid(solution) {
+        const $root = createDiv('grid', 'grid')
+        const rows = []
+        let i = 0
+        let j = 0
+        let row
+        let cell
+
+        while(j < solution.gridSize.height) {
+          row = []
+          $rowEl = createDiv(`r${i}:${j}`, `row ${j % 2 ? 'odd' : 'even'}`)
+          $root.appendChild($rowEl)
+          rows.push(row)
+
+          while(i < solution.gridSize.width) {
+            $cellEl = createDiv(`c${i}:${j}`, `cell ${i % 2 ? 'odd' : 'even'}`)
+            $cellEl.innerHTML = solution.grid[j][i]
+            $rowEl.appendChild($cellEl)
+            row.push($cellEl)
+            i++
+          }
+          j++
+        }
+
+        function get(x, y) {
+          return rows[x] && rows[x][y]
+        }
+
+        return {
+          $root,
+          get
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <p>Paste your puzzle input below then click: <a href="javascript:start()">[Start]</a></p>
+    <div id="puzzle"></div>
+    <div id="instructions">
+      <textarea id="input">
+    |
+    |  +--+
+    A  |  C
+F---|----E|--+
+    |  |  |  D
+    +B-+  +--+
+      </textarea>
+    </div>
+
+    <div id="errors"></div>
+  </body>
+</html>
