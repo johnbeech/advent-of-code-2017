@@ -2,8 +2,14 @@ const path = require('path')
 const {read} = require('promise-path')
 const NL = '\n'
 
-function parseVector (vector) {
-  return vector.substr(3).replace('>', '').split(',').map(n => parseInt(n))
+function parseVector (inputFragment) {
+  let vector = inputFragment.substr(3).replace('>', '').split(',').map(n => parseInt(n))
+
+  return {
+    x: vector[0],
+    y: vector[1],
+    z: vector[2]
+  }
 }
 
 function parseLine (line) {
