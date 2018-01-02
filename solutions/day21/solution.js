@@ -58,11 +58,12 @@ function transposePatterns (instruction) {
     mirrorArray(rotateArray(rotateArray(rotateArray(pattern))))
   ].map(n => JSON.stringify(n)))
 
-  console.log('Pattern Set', [...patternSet])
+  // console.log('Pattern Set', [...patternSet])
 
   return {
-    division: instruction.division,
-    patterns: [...patternSet].map(n => JSON.parse(n))
+    pattern,
+    patterns: [...patternSet].map(n => JSON.parse(n)),
+    division: instruction.division
   }
 }
 
@@ -70,15 +71,12 @@ function solve (instructions) {
   const expandedInstructions = instructions.map(transposePatterns)
 
   console.log('Instructions')
-  instructions.map(n => {
-    return {
-      pattern: displayPattern(n.pattern),
-      division: displayPattern(n.division)
-    }
-  }).forEach(n => console.log('Pattern', NL + n.pattern, NL + 'Division', NL + n.division, NL))
+  expandedInstructions.forEach(n => {
+    console.log([`Pattern (${n.patterns.length} variants)`, displayPattern(n.pattern), 'Division', displayPattern(n.division)].join(NL + NL), NL)
+  })
 
-  console.log('Expanded Instructions')
-  expandedInstructions.map(n => n.patterns.map(displayPattern).map(n => console.log(n, NL)))
+  // console.log('Expanded Instructions')
+  // expandedInstructions.map(n => n.patterns.map(displayPattern).map(n => console.log(n, NL)))
 
   return {
     input: instructions.length + ' instructions',
